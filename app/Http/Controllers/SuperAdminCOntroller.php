@@ -375,7 +375,6 @@ class SuperAdminController extends Controller
 
     public function updateEvent(Request $request, Event $event)
     {
-        // ... (method index, create, store, edit Anda di sini) ...
 
         /**
          * Memperbarui data event di database.
@@ -489,18 +488,11 @@ class SuperAdminController extends Controller
 
     public function destroyEvent(Event $event)
     {
-        // 1. HAPUS GAMBAR LAMA DARI STORAGE JIKA ADA
-        // Ini mencegah file sampah tertinggal di server.
         if ($event->image) {
             Storage::disk('public')->delete($event->image);
         }
-
-        // 2. HAPUS RECORD EVENT DARI DATABASE
-        // Jika Anda sudah mengatur onDelete('cascade') di migrasi,
-        // semua kelas pertandingan yang terkait akan terhapus secara otomatis.
         $event->delete();
 
-        // 3. REDIRECT KEMBALI DENGAN PESAN SUKSES
         return redirect()->route('superadmin.kelola_event')->with('success', 'Event "' . $event->name . '" berhasil dihapus.');
     }
 }

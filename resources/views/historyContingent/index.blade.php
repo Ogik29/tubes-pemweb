@@ -109,7 +109,7 @@
                                             // Ambil transaksi pertama untuk kontingen ini
                                             $transaction = $contingent->transactions->first();
                                         @endphp
-                                        @if ($contingent->status == 3 && $contingent->event->harga_contingent > 0 && !$transaction->foto_invoice)
+                                        @if ($contingent->status == 3 && $contingent->event->harga_contingent > 0 && (!$transaction || !$transaction->foto_invoice))
                                             <a href="{{ route('invoiceContingent.show', $contingent->id) }}" class="btn btn-info">Invoice Kontingen</a>
                                         @endif
 
@@ -289,7 +289,7 @@
                                             // Ambil transaksi pertama untuk kontingen ini
                                             $transaction = $contingent->transactions->first();
                                         @endphp
-                                        @if (($contingent->status == 3 || $contingent->status == 2) && ($contingent->event->harga_contingent > 0 && $transaction->foto_invoice))
+                                        @if (($contingent->status == 3 || $contingent->status == 2) && ($contingent->event->harga_contingent > 0 && $transaction && $transaction->foto_invoice))
                                             <div class="mb-3">
                                                 <label for="foto_invoice-{{ $contingent->id }}" class="form-label">Bukti Bayar Kontingen</label>
                                                 @php $transaction = $contingent->transactions->first(); @endphp

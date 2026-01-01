@@ -86,14 +86,10 @@ class adminController extends Controller
             'kelasPertandingan.jenisPertandingan'
         ];
 
-        $contingentsForVerification = Contingent::with(['user', 'event', 'transactions'])
+        $contingentsForVerification = Contingent::with(['user', 'event', 'transactions', 'players'])
             ->whereIn('event_id', $managedEventIds)->where('status', 0)->latest()->get();
-        $contingentsForDataVerification = Contingent::with(['user', 'event', 'transactions'])
+        $contingentsForDataVerification = Contingent::with(['user', 'event', 'transactions', 'players'])
             ->whereIn('event_id', $managedEventIds)->where('status', 3)->latest()->get();
-
-        // ===============================================
-        // AWAL DARI BLOK LOGIKA YANG DIREVISI TOTAL
-        // ===============================================
 
         // GRUP 1: Atlet yang menunggu verifikasi PEMBAYARAN.
         // Syarat:
@@ -134,9 +130,6 @@ class adminController extends Controller
         $groupedPlayersForVerification = $this->groupPlayers($playersForPaymentVerification);
         $groupedPlayersForDataVerification = $this->groupPlayers($playersForDataVerification);
 
-        // ===============================================
-        // AKHIR DARI BLOK LOGIKA YANG DIREVISI
-        // ===============================================
 
         $approvedContingents = Contingent::with(['user', 'event', 'players'])
             ->whereIn('event_id', $managedEventIds)->where('status', 1)->latest('updated_at')->get();

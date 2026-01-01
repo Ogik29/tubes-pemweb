@@ -389,7 +389,6 @@ class EventController extends Controller
     public function show_invoice_contingent($contingent_id)
     {
         $contingent = Contingent::with('event')->findOrFail($contingent_id);
-        $transaction = Transaction::where('contingent_id', $contingent_id)->first();
 
         if ($contingent->user_id !== Auth::id()) {
             abort(403, 'Akses tidak diizinkan.');
@@ -399,6 +398,16 @@ class EventController extends Controller
         if ($contingent->event->harga_contingent <= 0) {
             return redirect()->route('history')->with('status', 'Event ini tidak memerlukan biaya pendaftaran kontingen.');
         }
+
+        // Cari atau buat transaksi baru jika belum ada
+        $transaction = Transaction::firstOrCreate(
+            ['contingent_id' => $contingent_id],
+            [
+                'total' => $contingent->event->harga_contingent,
+                'date' => now(),
+                'foto_invoice' => null,
+            ]
+        );
 
         return view('invoice.invoiceContingent', [
             'contingent' => $contingent,
