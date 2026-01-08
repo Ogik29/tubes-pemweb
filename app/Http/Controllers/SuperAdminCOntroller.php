@@ -95,9 +95,6 @@ class SuperAdminController extends Controller
             'event_ids.*' => 'exists:events,id', // Memastikan setiap ID event yang dikirim itu valid
         ]);
 
-        // 2. BUAT USER BARU
-        // Gunakan User::create untuk membuat record baru di tabel 'users'.
-        // Pastikan semua field ini ada di dalam properti '$fillable' di model User Anda.
         $admin = User::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
@@ -112,23 +109,16 @@ class SuperAdminController extends Controller
             'role_id' => $request->role_id, // Mengambil nilai dari hidden input (yaitu '2')
         ]);
 
-        // 3. SIMPAN RELASI KE TABEL PIVOT
-        // Setelah user berhasil dibuat, kita lampirkan event yang dipilih ke user tersebut.
-        // Method sync() adalah cara terbaik untuk mengelola relasi many-to-many.
         $admin->events()->sync($request->event_ids);
 
-        // 4. REDIRECT KEMBALI DENGAN PESAN SUKSES
-        // Arahkan pengguna kembali ke halaman daftar admin.
         return redirect()->route('superadmin.kelola_admin')->with('success', 'Admin baru bernama "' . $request->nama_lengkap . '" berhasil ditambahkan.');
     }
 
 
     public function editAdmin(User $admin)
     {
-        // Eager load relasi events untuk efisiensi
         $admin->load('events');
 
-        // Ambil semua event untuk dropdown
         $events = Event::select('id', 'name')->latest()->get();
 
         return view('superadmin.edit_admin', compact('admin', 'events'));
@@ -325,9 +315,6 @@ class SuperAdminController extends Controller
         $daftar_rentang_usia = DB::table('rentang_usia')->get();
         $daftar_kelas = Kelas::orderBy('nama_kelas')->get();
 
-        // =================================================================
-        // 3. LOGIKA GROUPING BARU & SEDERHANA (TANPA GROUPKEY MANUAL)
-        // =================================================================
 
         // Gunakan 'groupBy' dari Laravel Collection untuk mengelompokkan secara otomatis.
         // Kunci grupnya adalah kombinasi dari SEMUA aturan yang mendefinisikan sebuah form grup.
@@ -377,8 +364,6 @@ class SuperAdminController extends Controller
     {
 
         /**
-         * Memperbarui data event di database.
-         * VERSI YANG SUDAH DIPERBAIKI TOTAL.
          *
          * @param  \Illuminate\Http\Request  $request
          * @param  \App\Models\Event  $event
@@ -451,10 +436,6 @@ class SuperAdminController extends Controller
             'juknis' => $request->juknis,
             'surat_rekom' => $request->surat_rekom,
         ]);
-
-        // =================================================================
-        // 4. SINKRONISASI DATA KELAS PERTANDINGAN DENGAN LOGIC BARU
-        // =================================================================
 
         // Hapus semua kelas pertandingan yang lama terkait event ini
         $event->kelasPertandingan()->delete();
